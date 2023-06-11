@@ -1,0 +1,65 @@
+﻿@using Academiq.Models
+@model Academiq.ViewModels.DashboardViewModel
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Course Name</th>
+            <th>Instructor</th>
+            <th>Instructor Email</th>
+            <th>Duration</th>
+            <th></th> <!-- column for the "Add" button -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model.AllAvailableCourses)
+        {
+        <tr>
+            <td>@course.Name</td>
+            <td>@course.Lecturer.FirstName @course.Lecturer.LastName</td>
+            <td>@course.Lecturer.Email</td>
+            <td>@course.Duration</td>
+            <td>
+                <button class="btn btn-primary add-course" data-course-id="@course.Id" type="button" @(Model.StudentRegistration.Status != (int?)RegistrationStatus.InProgress ? "disabled" : "")>Add</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".add-course").click(function () {
+            var courseId = $(this).data("course-id");
+            addCourse(courseId);
+        });
+
+        function addCourse(courseId) {
+            $.ajax({
+                url: '/Home/AddCourseToRegistration',
+                type: 'POST',
+                data: { courseId: courseId },
+                success: function (response) {
+                    if (response.Status === "Success") {
+                        alert("Course added successfully!");
+                        $("#registration").html(response.data);
+                    } else {
+                        alert("There was an error adding the course: " + response.error);
+                    }
+                },
+                error: handleAjaxError
+            });
+        }
+
+        function handleAjaxError(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status == 400) {
+                var jsonResponse = JSON.parse(jqXHR.responseText);
+                alert("There was an error adding the course: " + jsonResponse.error);
+            } else {
+                alert("There was an error communicating with the server.");
+                console.log(jqXHR, textStatus, errorThrown);
+            }
+        }
+    });
+</script>

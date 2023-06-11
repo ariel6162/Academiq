@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+@model Academiq.ViewModels.DashboardViewModel
+
+<h2>Available Courses</h2>
+
+<div id="courses">
+    @Html.Partial("_Courses", Model)
+</div>
+
+<div id="buttons">
+    @Html.Partial("_RegistrationButtons", Model)
+</div>
+
+<div id="registration">
+    @Html.Partial("_StudentRegistrationData", Model.StudentRegistration)
+</div>
